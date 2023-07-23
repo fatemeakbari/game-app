@@ -1,4 +1,4 @@
-package userservice
+package user
 
 import (
 	"errors"
@@ -7,13 +7,13 @@ import (
 	"messagingapp/pkg/phonenumber"
 )
 
-type UserRepository interface {
+type Repository interface {
 	IsPhoneNumberUnique(phoneNumber string) (bool, error)
 	Register(user entity.User) (entity.User, error)
 }
 
-type UserService struct {
-	userRepo UserRepository
+type Service struct {
+	UserRepository Repository
 }
 
 type RegisterRequest struct {
@@ -25,17 +25,17 @@ type RegisterResponse struct {
 	entity.User
 }
 
-func (s *UserService) Register(req RegisterRequest) (RegisterResponse, error) {
+func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 
 	if res, err := s.validPhoneNumber(req.PhoneNumber); err != nil || !res {
-		return RegisterResponse{}, fmt.Errorf("phone number must be valid %w", err)
+		return RegisterResponse{}, err
 	}
 
 	if len(req.Name) == 0 {
 		return RegisterResponse{}, errors.New("your name must not be empty")
 	}
 
-	user, err := s.userRepo.Register(
+	user, err := s.UserRepository.Register(
 		entity.User{
 			Name:        req.Name,
 			PhoneNumber: req.PhoneNumber,
@@ -49,13 +49,13 @@ func (s *UserService) Register(req RegisterRequest) (RegisterResponse, error) {
 	return RegisterResponse{user}, nil
 }
 
-func (s *UserService) validPhoneNumber(phoneNumber string) (bool, error) {
+func (s *Service) validPhoneNumber(phoneNumber string) (bool, error) {
 
 	if !phonenumber.IsValid(phoneNumber) {
-		return false, nil
+		return false, errors.New("phone number is not valid format")
 	}
 
-	if res, err := s.userRepo.IsPhoneNumberUnique(phoneNumber); err != nil {
+	if res, err := s.UserRepository.IsPhoneNumberUnique(phoneNumber); err != nil {
 		return false, err
 	} else {
 		return res, nil

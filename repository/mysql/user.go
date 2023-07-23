@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"messagingapp/entity"
 )
@@ -23,8 +24,9 @@ func (db *DB) Register(user entity.User) (entity.User, error) {
 
 func (db *DB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
 
-	row := db.db.QueryRow(`select * from users where phone_number = ?`, phoneNumber)
-	err := row.Scan()
+	row := db.db.QueryRow(`select id from users where phone_number = ?`, phoneNumber)
+	var id uint
+	err := row.Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 
@@ -34,5 +36,5 @@ func (db *DB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
 		return false, err
 	}
 
-	return false, nil
+	return false, errors.New("phone number is duplicated")
 }
