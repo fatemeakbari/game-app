@@ -3,27 +3,48 @@ package user
 import (
 	"errors"
 	"fmt"
+	"github.com/golang-jwt/jwt/v4"
+	"messagingapp/cfg"
 	"messagingapp/entity"
 	"messagingapp/pkg/phonenumber"
+	"time"
 )
 
 type Repository interface {
 	IsPhoneNumberUnique(phoneNumber string) (bool, error)
 	Register(user entity.User) (entity.User, error)
+	FindUserByPhoneNumber(phoneNumber string) (entity.User, error)
+}
+
+type Hashing interface {
+	Hash(str string) string
 }
 
 type Service struct {
 	UserRepository Repository
+	Hashing        Hashing
 }
 
 type RegisterRequest struct {
 	Name        string
 	PhoneNumber string
+	Password    string
 }
 
 type RegisterResponse struct {
 	entity.User
 }
+
+type LoginRequest struct {
+	PhoneNumber string
+	Password    string
+}
+
+type LoginResponse struct {
+	AuthorizedToken string
+}
+
+type JwtToken = string
 
 func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 
@@ -39,6 +60,7 @@ func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 		entity.User{
 			Name:        req.Name,
 			PhoneNumber: req.PhoneNumber,
+			Password:    s.Hashing.Hash(req.Password),
 		},
 	)
 
@@ -49,6 +71,46 @@ func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 	return RegisterResponse{user}, nil
 }
 
+func (s *Service) Login(req LoginRequest) (LoginResponse, error) {
+
+	user, err := s.UserRepository.FindUserByPhoneNumber(req.PhoneNumber)
+
+	if err != nil {
+		return LoginResponse{}, err
+	}
+
+	if user.Password != s.Hashing.Hash(req.Password) {
+		return LoginResponse{}, errors.New("phone number or password is wrong")
+	}
+
+	token, err := generateJwtToken(user.ID)
+
+	if err != nil {
+		return LoginResponse{}, errors.New("unexpected error in generating token")
+	}
+
+	return LoginResponse{AuthorizedToken: token}, nil
+
+}
+
+func generateJwtToken(userId uint) (JwtToken, error) {
+
+	// Create a new token object, specifying signing method and the claims
+	// you would like it to contain.
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userId":          userId,
+		"expiration_date": time.Now().Add(cfg.TokenExpirationDuration),
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenStr, err := token.SignedString([]byte(cfg.TokenSecretKey))
+	if err != nil {
+		return "", fmt.Errorf("error in signed token, %w", err)
+	}
+
+	return tokenStr, err
+}
+
 func (s *Service) validPhoneNumber(phoneNumber string) (bool, error) {
 
 	if !phonenumber.IsValid(phoneNumber) {
@@ -57,8 +119,10 @@ func (s *Service) validPhoneNumber(phoneNumber string) (bool, error) {
 
 	if res, err := s.UserRepository.IsPhoneNumberUnique(phoneNumber); err != nil {
 		return false, err
-	} else {
-		return res, nil
+	} else if !res {
+		return res, errors.New("phone number is duplicated")
 	}
+
+	return true, nil
 
 }
