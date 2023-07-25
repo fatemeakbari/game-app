@@ -25,14 +25,12 @@ func (s *Server) Serve() {
 	e.GET("/", hello)
 	userGroup := e.Group("/users")
 	userGroup.POST("/register", s.UserRegisterHandler)
+	userGroup.POST("/login", s.UserLoginHandler)
+	userGroup.GET("/profile", s.UserProfileHandler)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
 
-	//http.HandleFunc("/users/register", s.UserRegisterHandler)
-	http.HandleFunc("/users/login", s.UserLoginHandler)
-	http.HandleFunc("/users/profile", s.UserProfileHandler)
-	http.ListenAndServe(":8080", nil)
 }
 
 // Handler

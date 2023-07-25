@@ -46,8 +46,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken  string
-	RefreshToken string
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type ProfileRequest struct {
@@ -55,7 +55,8 @@ type ProfileRequest struct {
 }
 
 type ProfileResponse struct {
-	Name string
+	Name        string `json:"name"`
+	PhoneNumber string `json:"phone_number"`
 }
 
 func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
@@ -125,7 +126,8 @@ func (s *Service) Profile(req ProfileRequest) (ProfileResponse, error) {
 	}
 
 	return ProfileResponse{
-		Name: user.Name,
+		Name:        user.Name,
+		PhoneNumber: user.PhoneNumber,
 	}, nil
 
 }
