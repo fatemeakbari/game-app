@@ -14,6 +14,7 @@ type Repository interface {
 	IsPhoneNumberUnique(phoneNumber string) (bool, error)
 	Register(user entity.User) (entity.User, error)
 	FindUserByPhoneNumber(phoneNumber string) (entity.User, error)
+	FindUserById(userId uint) (entity.User, error)
 }
 
 type Hashing interface {
@@ -45,6 +46,23 @@ type LoginResponse struct {
 }
 
 type JwtToken = string
+
+type ProfileRequest struct {
+	UserId uint
+}
+
+type ProfileResponse struct {
+	Name string
+}
+
+type Claims struct {
+	RegisteredClaims jwt.RegisteredClaims
+	UserID           uint
+}
+
+func (c Claims) Valid() error {
+	return c.RegisteredClaims.Valid()
+}
 
 func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 
@@ -93,13 +111,29 @@ func (s *Service) Login(req LoginRequest) (LoginResponse, error) {
 
 }
 
-func generateJwtToken(userId uint) (JwtToken, error) {
+func (s *Service) Profile(req ProfileRequest) (ProfileResponse, error) {
+
+	user, err := s.UserRepository.FindUserById(req.UserId)
+
+	if err != nil {
+		return ProfileResponse{}, err
+	}
+
+	return ProfileResponse{
+		Name: user.Name,
+	}, nil
+
+}
+func generateJwtToken(userId uint) (string, error) {
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userId":          userId,
-		"expiration_date": time.Now().Add(cfg.TokenExpirationDuration),
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
+		UserID: userId,
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.TokenExpirationDuration)),
+		},
 	})
 
 	// Sign and get the complete encoded token as a string using the secret

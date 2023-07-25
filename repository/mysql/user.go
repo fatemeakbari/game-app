@@ -57,3 +57,22 @@ func (db *DB) FindUserByPhoneNumber(phoneNumber string) (entity.User, error) {
 	return user, nil
 
 }
+
+func (db *DB) FindUserById(userId uint) (entity.User, error) {
+	row := db.db.QueryRow(`select * from users where id = ?`, userId)
+
+	var user entity.User
+	var createDate []uint8
+
+	err := row.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createDate, &user.Password)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.User{}, errors.New("user not found")
+		}
+		return entity.User{}, fmt.Errorf("unexpected error : %w", err)
+	}
+
+	return user, nil
+
+}
