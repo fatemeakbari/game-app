@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
 	"io"
 	"messagingapp/cfg"
 	"messagingapp/pkg/hashing"
 	"messagingapp/repository/mysql"
+	authservice "messagingapp/service/auth"
 	userservice "messagingapp/service/user"
 	"net/http"
 	"strings"
@@ -111,10 +111,12 @@ func userLoginHandler(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	userRep := mysql.New()
+	generateTokenService := authservice.New(cfg.TokenSecretKey, cfg.TokenExpirationDuration, cfg.TokenRefreshDuration)
 
 	userService := userservice.Service{
 		UserRepository: userRep,
 		Hashing:        hashing.SHA256{},
+		TokenGenerator: generateTokenService,
 	}
 
 	response, err := userService.Login(loginReq)
@@ -129,7 +131,7 @@ func userLoginHandler(writer http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprintf(
 		writer,
-		fmt.Sprintf(`{"authorized_token":"%s"`, response.AuthorizedToken),
+		fmt.Sprintf(`{"access_token":"%s", "refresh_token":"%s"}`, response.AccessToken, response.RefreshToken),
 	)
 
 }
@@ -147,7 +149,9 @@ func userProfileHandler(writer http.ResponseWriter, req *http.Request) {
 
 	token = strings.Replace(token, "Bearer ", "", 1)
 
-	claims, err := parseJwtToken(token)
+	parseTokenService := authservice.New(cfg.TokenSecretKey, cfg.TokenExpirationDuration, cfg.TokenRefreshDuration)
+
+	claims, err := parseTokenService.Parse(token)
 
 	if err != nil {
 		errors.New("token is wrong")
@@ -176,25 +180,4 @@ func userProfileHandler(writer http.ResponseWriter, req *http.Request) {
 	strRes, _ := json.Marshal(response)
 
 	fmt.Fprintf(writer, string(strRes))
-}
-
-func parseJwtToken(tokenStr string) (userservice.Claims, error) {
-
-	var claims userservice.Claims
-
-	_, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return []byte(cfg.TokenSecretKey), nil
-	})
-
-	if err != nil {
-		return userservice.Claims{}, errors.New("error in parsing token")
-	}
-
-	return claims, nil
 }

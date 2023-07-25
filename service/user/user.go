@@ -3,11 +3,9 @@ package user
 import (
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
-	"messagingapp/cfg"
 	"messagingapp/entity"
 	"messagingapp/pkg/phonenumber"
-	"time"
+	authservice "messagingapp/service/auth"
 )
 
 type Repository interface {
@@ -24,6 +22,7 @@ type Hashing interface {
 type Service struct {
 	UserRepository Repository
 	Hashing        Hashing
+	TokenGenerator authservice.JwtTokenGenerator
 }
 
 type RegisterRequest struct {
@@ -42,10 +41,9 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AuthorizedToken string
+	AccessToken  string
+	RefreshToken string
 }
-
-type JwtToken = string
 
 type ProfileRequest struct {
 	UserId uint
@@ -53,15 +51,6 @@ type ProfileRequest struct {
 
 type ProfileResponse struct {
 	Name string
-}
-
-type Claims struct {
-	RegisteredClaims jwt.RegisteredClaims
-	UserID           uint
-}
-
-func (c Claims) Valid() error {
-	return c.RegisteredClaims.Valid()
 }
 
 func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
@@ -101,13 +90,19 @@ func (s *Service) Login(req LoginRequest) (LoginResponse, error) {
 		return LoginResponse{}, errors.New("phone number or password is wrong")
 	}
 
-	token, err := generateJwtToken(user.ID)
+	accToken, err := s.TokenGenerator.GenerateAccessToken(user)
 
 	if err != nil {
-		return LoginResponse{}, errors.New("unexpected error in generating token")
+		return LoginResponse{}, errors.New("unexpected error in generating access token")
 	}
 
-	return LoginResponse{AuthorizedToken: token}, nil
+	refToken, err := s.TokenGenerator.GenerateRefreshToken(user)
+
+	if err != nil {
+		return LoginResponse{}, errors.New("unexpected error in generating refresh token")
+	}
+
+	return LoginResponse{AccessToken: accToken, RefreshToken: refToken}, nil
 
 }
 
@@ -123,26 +118,6 @@ func (s *Service) Profile(req ProfileRequest) (ProfileResponse, error) {
 		Name: user.Name,
 	}, nil
 
-}
-func generateJwtToken(userId uint) (string, error) {
-
-	// Create a new token object, specifying signing method and the claims
-	// you would like it to contain.
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
-		UserID: userId,
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.TokenExpirationDuration)),
-		},
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenStr, err := token.SignedString([]byte(cfg.TokenSecretKey))
-	if err != nil {
-		return "", fmt.Errorf("error in signed token, %w", err)
-	}
-
-	return tokenStr, err
 }
 
 func (s *Service) validPhoneNumber(phoneNumber string) (bool, error) {
