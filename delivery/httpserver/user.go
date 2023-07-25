@@ -4,59 +4,29 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/labstack/echo/v4"
 	"io"
 	userservice "messagingapp/service/user"
 	"net/http"
 	"strings"
 )
 
-func (s *Server) UserRegisterHandler(writer http.ResponseWriter, req *http.Request) {
+func (s *Server) UserRegisterHandler(c echo.Context) error {
 
-	if req.Method != http.MethodPost {
-		fmt.Fprintf(
-			writer,
-			"invalid method",
-		)
-		return
+	var registerReq userservice.RegisterRequest
+
+	if err := c.Bind(&registerReq); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "request form is wrong")
 	}
 
-	body, err := io.ReadAll(req.Body)
+	response, err := s.UserService.Register(registerReq)
 
 	if err != nil {
-		fmt.Fprintf(
-			writer,
-			fmt.Sprintf(`{"error": "error in reading request %w"}`, err),
-		)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 
-		return
 	}
 
-	var uReq userservice.RegisterRequest
-	if err := json.Unmarshal(body, &uReq); err != nil {
-		fmt.Fprintf(
-			writer,
-			fmt.Sprintf(`{"error": "error in parsing request %w"}`, err),
-		)
-
-		return
-	}
-
-	response, err := s.UserService.Register(uReq)
-
-	if err != nil {
-		fmt.Fprintf(
-			writer,
-			fmt.Sprintf(`{"error": "error in register", details":"%s"}`, err),
-		)
-		return
-	}
-
-	byteRes, _ := json.Marshal(response)
-	fmt.Fprintf(
-		writer,
-		string(byteRes),
-	)
-
+	return c.JSON(http.StatusCreated, response)
 }
 
 func (s *Server) UserLoginHandler(writer http.ResponseWriter, req *http.Request) {

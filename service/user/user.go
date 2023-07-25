@@ -30,9 +30,14 @@ type RegisterRequest struct {
 	PhoneNumber string
 	Password    string
 }
+type UserInfo struct {
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	PhoneNumber string `json:"phone_number"`
+}
 
 type RegisterResponse struct {
-	entity.User
+	UserInfo `json:"user"`
 }
 
 type LoginRequest struct {
@@ -75,7 +80,12 @@ func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 		return RegisterResponse{}, fmt.Errorf("error is save user %w", err)
 	}
 
-	return RegisterResponse{user}, nil
+	return RegisterResponse{
+		UserInfo: UserInfo{
+			ID:          user.ID,
+			Name:        user.Name,
+			PhoneNumber: user.PhoneNumber,
+		}}, nil
 }
 
 func (s *Service) Login(req LoginRequest) (LoginResponse, error) {
