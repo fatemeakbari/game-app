@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"messagingapp/cfg"
 	"messagingapp/entity"
 	"time"
 )
@@ -29,23 +28,23 @@ type Service struct {
 	tokenRefreshDuration    time.Duration
 }
 
-func New(secretKey string, expirationDuration, refreshDuration time.Duration) Service {
+func New(config Config) Service {
 	return Service{
-		secretKey:               secretKey,
-		tokenExpirationDuration: expirationDuration,
-		tokenRefreshDuration:    refreshDuration,
+		secretKey:               config.TokenSecretKey,
+		tokenExpirationDuration: config.TokenExpirationDuration,
+		tokenRefreshDuration:    config.TokenRefreshDuration,
 	}
 }
 
 func (s Service) GenerateAccessToken(user entity.User) (string, error) {
-	return generate(user, AccessTokenSubject, s.tokenExpirationDuration)
+	return s.generate(user, AccessTokenSubject, s.tokenExpirationDuration)
 }
 
 func (s Service) GenerateRefreshToken(user entity.User) (string, error) {
-	return generate(user, RefreshTokenSubject, s.tokenRefreshDuration)
+	return s.generate(user, RefreshTokenSubject, s.tokenRefreshDuration)
 }
 
-func generate(user entity.User, subject string, expireDate time.Duration) (string, error) {
+func (s Service) generate(user entity.User, subject string, expireDate time.Duration) (string, error) {
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
@@ -59,7 +58,7 @@ func generate(user entity.User, subject string, expireDate time.Duration) (strin
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
-	tokenStr, err := token.SignedString([]byte(cfg.TokenSecretKey))
+	tokenStr, err := token.SignedString([]byte(s.secretKey))
 	if err != nil {
 		return "", fmt.Errorf("error in signed token, %w", err)
 	}
@@ -78,7 +77,7 @@ func (s Service) Parse(tokenStr string) (Claims, error) {
 		}
 
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return []byte(cfg.TokenSecretKey), nil
+		return []byte(s.secretKey), nil
 	})
 
 	if err != nil {

@@ -11,9 +11,9 @@ type DB struct {
 	db *sql.DB
 }
 
-func New() *DB {
+func New(cfg Config) *DB {
 
-	db, err := sql.Open("mysql", "root:12345@(localhost:3309)/messagingapp")
+	db, err := sql.Open(cfg.Driver, cfg.buildURL())
 	if err != nil {
 		log.Fatal("can not connect to sql driver", err)
 	}
