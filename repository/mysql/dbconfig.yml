@@ -1,0 +1,11 @@
+development:
+  dialect: mysql
+  datasource: root:12345@(localhost:3309)/messagingapp?parseTime=true
+  dir: migrations/sql
+  table: migrations
+
+production:
+  dialect: mysql
+  datasource: root:12345@(localhost:3309)/messagingapp?parseTime=true
+  dir: migrations/sql
+  table: migrations
