@@ -3,16 +3,16 @@ package user
 import (
 	"errors"
 	"fmt"
-	"messagingapp/entity"
+	"messagingapp/model"
 	"messagingapp/pkg/phonenumber"
 	authservice "messagingapp/service/auth"
 )
 
 type Repository interface {
 	IsPhoneNumberUnique(phoneNumber string) (bool, error)
-	Register(user entity.User) (entity.User, error)
-	FindUserByPhoneNumber(phoneNumber string) (entity.User, error)
-	FindUserById(userId uint) (entity.User, error)
+	Register(user model.User) (model.User, error)
+	FindUserByPhoneNumber(phoneNumber string) (model.User, error)
+	FindUserById(userId uint) (model.User, error)
 }
 
 type Hashing interface {
@@ -70,7 +70,7 @@ func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 	}
 
 	user, err := s.UserRepository.Register(
-		entity.User{
+		model.User{
 			Name:        req.Name,
 			PhoneNumber: req.PhoneNumber,
 			Password:    s.Hashing.Hash(req.Password),

@@ -1,7 +1,7 @@
 package mysql_test
 
 import (
-	"messagingapp/entity"
+	"messagingapp/model"
 	"messagingapp/repository/mysql"
 	"testing"
 )
@@ -10,7 +10,7 @@ var db = mysql.New()
 
 func TestRegister(t *testing.T) {
 
-	_, err := db.Register(entity.User{Name: "fateme", PhoneNumber: "09151870482"})
+	_, err := db.Register(model.User{Name: "fateme", PhoneNumber: "09151870482"})
 
 	if err != nil {
 		t.Error(err)
