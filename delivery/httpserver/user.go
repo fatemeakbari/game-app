@@ -2,14 +2,14 @@ package httpserver
 
 import (
 	"github.com/labstack/echo/v4"
-	userservice "messagingapp/service/userservice"
+	entity "messagingapp/entity/userentity"
 	"net/http"
 	"strings"
 )
 
 func (s *Server) UserRegisterHandler(c echo.Context) error {
 
-	var registerReq userservice.RegisterRequest
+	var registerReq entity.RegisterRequest
 
 	if err := c.Bind(&registerReq); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "request form is wrong")
@@ -27,10 +27,10 @@ func (s *Server) UserRegisterHandler(c echo.Context) error {
 
 func (s *Server) UserLoginHandler(c echo.Context) error {
 
-	var loginReq userservice.LoginRequest
+	var loginReq entity.LoginRequest
 
 	if err := c.Bind(&loginReq); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "request form is wrong")
+		return echo.NewHTTPError(http.StatusBadRequest, "request format is wrong")
 	}
 
 	response, err := s.UserService.Login(loginReq)
@@ -52,7 +52,7 @@ func (s *Server) UserProfileHandler(c echo.Context) error {
 
 	claims, err := s.AuthService.Parse(token)
 
-	profileReq := userservice.ProfileRequest{
+	profileReq := entity.ProfileRequest{
 		UserId: claims.UserID,
 	}
 

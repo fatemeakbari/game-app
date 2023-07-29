@@ -12,7 +12,7 @@ func (db *DB) Register(user model.User) (model.User, error) {
 	res, err := db.db.Exec(`insert into users(name, phone_number, password) values (?,?,?)`, user.Name, user.PhoneNumber, user.Password)
 
 	if err != nil {
-		return model.User{}, fmt.Errorf("cant not save userservice %w", err)
+		return model.User{}, fmt.Errorf("cant not save user %w", err)
 	}
 
 	id, _ := res.LastInsertId()
@@ -49,7 +49,7 @@ func (db *DB) FindUserByPhoneNumber(phoneNumber string) (model.User, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return model.User{}, errors.New("userservice not found")
+			return model.User{}, errors.New("user not found")
 		}
 		return model.User{}, fmt.Errorf("unexpected error : %w", err)
 	}
@@ -68,7 +68,7 @@ func (db *DB) FindUserById(userId uint) (model.User, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return model.User{}, errors.New("userservice not found")
+			return model.User{}, errors.New("user not found")
 		}
 		return model.User{}, fmt.Errorf("unexpected error : %w", err)
 	}

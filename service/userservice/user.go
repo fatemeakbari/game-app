@@ -45,7 +45,7 @@ func (s *Service) Register(req entity.RegisterRequest) (entity.RegisterResponse,
 	)
 
 	if err != nil {
-		return entity.RegisterResponse{}, fmt.Errorf("error is save userservice %w", err)
+		return entity.RegisterResponse{}, fmt.Errorf("error is save user %w", err)
 	}
 
 	return entity.RegisterResponse{
