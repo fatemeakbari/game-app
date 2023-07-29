@@ -6,7 +6,7 @@ import (
 	"messagingapp/pkg/hashing"
 	"messagingapp/repository/mysql"
 	"messagingapp/service/auth"
-	userservice "messagingapp/service/user"
+	userservice "messagingapp/service/userservice"
 	"time"
 )
 

@@ -4,13 +4,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	authservice "messagingapp/service/auth"
-	"messagingapp/service/user"
+	"messagingapp/service/userservice"
 	"net/http"
 )
 
 type Server struct {
 	AuthService authservice.Service
-	UserService user.Service
+	UserService userservice.Service
 }
 
 func (s *Server) Serve() {

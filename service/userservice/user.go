@@ -1,8 +1,9 @@
-package user
+package userservice
 
 import (
 	"errors"
 	"fmt"
+	entity "messagingapp/entity/userentity"
 	"messagingapp/model"
 	"messagingapp/pkg/phonenumber"
 	authservice "messagingapp/service/auth"
@@ -25,48 +26,14 @@ type Service struct {
 	TokenGenerator authservice.JwtTokenGenerator
 }
 
-type RegisterRequest struct {
-	Name        string
-	PhoneNumber string
-	Password    string
-}
-type UserInfo struct {
-	ID          uint   `json:"id"`
-	Name        string `json:"name"`
-	PhoneNumber string `json:"phone_number"`
-}
-
-type RegisterResponse struct {
-	UserInfo `json:"user"`
-}
-
-type LoginRequest struct {
-	PhoneNumber string
-	Password    string
-}
-
-type LoginResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-}
-
-type ProfileRequest struct {
-	UserId uint
-}
-
-type ProfileResponse struct {
-	Name        string `json:"name"`
-	PhoneNumber string `json:"phone_number"`
-}
-
-func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
+func (s *Service) Register(req entity.RegisterRequest) (entity.RegisterResponse, error) {
 
 	if res, err := s.validPhoneNumber(req.PhoneNumber); err != nil || !res {
-		return RegisterResponse{}, err
+		return entity.RegisterResponse{}, err
 	}
 
 	if len(req.Name) == 0 {
-		return RegisterResponse{}, errors.New("your name must not be empty")
+		return entity.RegisterResponse{}, errors.New("your name must not be empty")
 	}
 
 	user, err := s.UserRepository.Register(
@@ -78,54 +45,54 @@ func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 	)
 
 	if err != nil {
-		return RegisterResponse{}, fmt.Errorf("error is save user %w", err)
+		return entity.RegisterResponse{}, fmt.Errorf("error is save userservice %w", err)
 	}
 
-	return RegisterResponse{
-		UserInfo: UserInfo{
+	return entity.RegisterResponse{
+		UserInfo: entity.UserInfo{
 			ID:          user.ID,
 			Name:        user.Name,
 			PhoneNumber: user.PhoneNumber,
 		}}, nil
 }
 
-func (s *Service) Login(req LoginRequest) (LoginResponse, error) {
+func (s *Service) Login(req entity.LoginRequest) (entity.LoginResponse, error) {
 
 	user, err := s.UserRepository.FindUserByPhoneNumber(req.PhoneNumber)
 
 	if err != nil {
-		return LoginResponse{}, err
+		return entity.LoginResponse{}, err
 	}
 
 	if user.Password != s.Hashing.Hash(req.Password) {
-		return LoginResponse{}, errors.New("phone number or password is wrong")
+		return entity.LoginResponse{}, errors.New("phone number or password is wrong")
 	}
 
 	accToken, err := s.TokenGenerator.GenerateAccessToken(user)
 
 	if err != nil {
-		return LoginResponse{}, errors.New("unexpected error in generating access token")
+		return entity.LoginResponse{}, errors.New("unexpected error in generating access token")
 	}
 
 	refToken, err := s.TokenGenerator.GenerateRefreshToken(user)
 
 	if err != nil {
-		return LoginResponse{}, errors.New("unexpected error in generating refresh token")
+		return entity.LoginResponse{}, errors.New("unexpected error in generating refresh token")
 	}
 
-	return LoginResponse{AccessToken: accToken, RefreshToken: refToken}, nil
+	return entity.LoginResponse{AccessToken: accToken, RefreshToken: refToken}, nil
 
 }
 
-func (s *Service) Profile(req ProfileRequest) (ProfileResponse, error) {
+func (s *Service) Profile(req entity.ProfileRequest) (entity.ProfileResponse, error) {
 
 	user, err := s.UserRepository.FindUserById(req.UserId)
 
 	if err != nil {
-		return ProfileResponse{}, err
+		return entity.ProfileResponse{}, err
 	}
 
-	return ProfileResponse{
+	return entity.ProfileResponse{
 		Name:        user.Name,
 		PhoneNumber: user.PhoneNumber,
 	}, nil

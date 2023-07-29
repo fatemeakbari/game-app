@@ -2,7 +2,7 @@ package httpserver
 
 import (
 	"github.com/labstack/echo/v4"
-	userservice "messagingapp/service/user"
+	userservice "messagingapp/service/userservice"
 	"net/http"
 	"strings"
 )
