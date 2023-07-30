@@ -3,8 +3,8 @@ package authservice
 import (
 	"errors"
 	"fmt"
+	"gameapp/model"
 	"github.com/golang-jwt/jwt/v4"
-	"messagingapp/model"
 	"time"
 )
 

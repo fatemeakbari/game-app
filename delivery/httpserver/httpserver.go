@@ -1,16 +1,16 @@
 package httpserver
 
 import (
+	authservice "gameapp/service/auth"
+	"gameapp/service/user"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	authservice "messagingapp/service/auth"
-	"messagingapp/service/userservice"
 	"net/http"
 )
 
 type Server struct {
 	AuthService authservice.Service
-	UserService userservice.Service
+	UserService user.Service
 }
 
 func (s *Server) Serve() {

@@ -1,8 +1,8 @@
 package httpserver
 
 import (
+	entity "gameapp/entity/userentity"
 	"github.com/labstack/echo/v4"
-	entity "messagingapp/entity/userentity"
 	"net/http"
 	"strings"
 )

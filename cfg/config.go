@@ -1,8 +1,8 @@
 package cfg
 
 import (
-	"messagingapp/repository/mysql"
-	authservice "messagingapp/service/auth"
+	"gameapp/repository/mysql"
+	authservice "gameapp/service/auth"
 	"time"
 )
 

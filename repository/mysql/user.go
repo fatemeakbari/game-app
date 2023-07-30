@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"messagingapp/model"
+	"gameapp/model"
 )
 
 func (db *DB) Register(user model.User) (model.User, error) {
@@ -12,7 +12,7 @@ func (db *DB) Register(user model.User) (model.User, error) {
 	res, err := db.db.Exec(`insert into users(name, phone_number, password) values (?,?,?)`, user.Name, user.PhoneNumber, user.Password)
 
 	if err != nil {
-		return model.User{}, fmt.Errorf("cant not save user %w", err)
+		return model.User{}, err
 	}
 
 	id, _ := res.LastInsertId()

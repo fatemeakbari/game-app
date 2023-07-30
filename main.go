@@ -1,12 +1,13 @@
 package main
 
 import (
-	"messagingapp/cfg"
-	"messagingapp/delivery/httpserver"
-	"messagingapp/pkg/hashing"
-	"messagingapp/repository/mysql"
-	"messagingapp/service/auth"
-	userservice "messagingapp/service/userservice"
+	"gameapp/cfg"
+	"gameapp/delivery/httpserver"
+	"gameapp/pkg/hashing"
+	"gameapp/repository/mysql"
+	"gameapp/service/auth"
+	userservice "gameapp/service/user"
+	uservalidator "gameapp/validator/user"
 	"time"
 )
 
@@ -30,11 +31,13 @@ func main() {
 	}
 	userRepository := mysql.New(config.DBConfig)
 	authService := authservice.New(config.AuthConfig)
+	userValidator := uservalidator.New(userRepository)
 
 	userService := userservice.Service{
 		UserRepository: userRepository,
 		TokenGenerator: authService,
 		Hashing:        hashing.SHA256{},
+		Validator:      userValidator,
 	}
 
 	server := httpserver.Server{
