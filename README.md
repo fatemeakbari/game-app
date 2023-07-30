@@ -1,4 +1,4 @@
-## Messaging App
+## Game App
 
 ### requirements
 
