@@ -3,6 +3,7 @@ package authservice
 import (
 	"errors"
 	"fmt"
+	"gameapp/entity/auth"
 	"gameapp/model"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
@@ -14,7 +15,7 @@ const (
 )
 
 type JwtTokenParser interface {
-	Parse(token string) (Claims, error)
+	Parse(token string) (auth.Claims, error)
 }
 
 type JwtTokenGenerator interface {
@@ -48,7 +49,7 @@ func (s Service) generate(user model.User, subject string, expireDate time.Durat
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &auth.Claims{
 		UserID: user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   subject,
@@ -66,9 +67,9 @@ func (s Service) generate(user model.User, subject string, expireDate time.Durat
 	return tokenStr, err
 }
 
-func (s Service) Parse(tokenStr string) (Claims, error) {
+func (s Service) Parse(tokenStr string) (auth.Claims, error) {
 
-	var claims Claims
+	var claims auth.Claims
 
 	_, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
@@ -81,7 +82,7 @@ func (s Service) Parse(tokenStr string) (Claims, error) {
 	})
 
 	if err != nil {
-		return Claims{}, errors.New("error in parsing token")
+		return auth.Claims{}, errors.New("error in parsing token")
 	}
 
 	return claims, nil

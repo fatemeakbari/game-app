@@ -3,6 +3,8 @@ package main
 import (
 	"gameapp/cfg"
 	"gameapp/delivery/httpserver"
+	"gameapp/delivery/httpserver/middleware"
+	"gameapp/delivery/httpserver/userhandler"
 	"gameapp/pkg/hashing"
 	"gameapp/repository/mysql"
 	"gameapp/service/auth"
@@ -40,9 +42,12 @@ func main() {
 		Validator:      userValidator,
 	}
 
+	authMW := middleware.New(authService)
+
+	userHandler := *userhandler.New(userService, authService, authMW)
+
 	server := httpserver.Server{
-		UserService: userService,
-		AuthService: authService,
+		UserHandler: userHandler,
 	}
 
 	server.Serve()

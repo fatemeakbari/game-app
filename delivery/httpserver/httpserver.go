@@ -1,16 +1,14 @@
 package httpserver
 
 import (
-	authservice "gameapp/service/auth"
-	"gameapp/service/user"
+	"gameapp/delivery/httpserver/userhandler"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
 )
 
 type Server struct {
-	AuthService authservice.Service
-	UserService user.Service
+	UserHandler userhandler.Handler
 }
 
 func (s *Server) Serve() {
@@ -22,11 +20,7 @@ func (s *Server) Serve() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", hello)
-	userGroup := e.Group("/users")
-	userGroup.POST("/register", s.UserRegisterHandler)
-	userGroup.POST("/login", s.UserLoginHandler)
-	userGroup.GET("/profile", s.UserProfileHandler)
+	s.UserHandler.Route(e)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
