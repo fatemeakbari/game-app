@@ -1,7 +1,7 @@
-package userentity
+package user
 
 type ProfileRequest struct {
-	UserId uint
+	UserId uint `json:"user_id"`
 }
 
 type ProfileResponse struct {

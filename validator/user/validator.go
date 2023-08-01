@@ -1,7 +1,16 @@
 package user
 
+import (
+	"gameapp/model"
+)
+
+const (
+	phoneNumberPattern = `^09\d{9}`
+)
+
 type Repository interface {
-	IsPhoneNumberUnique(phoneNumber string) (bool, error)
+	IsPhoneNumberExist(phoneNumber string) (bool, error)
+	FindUserByPhoneNumber(phoneNumber string) (model.User, error)
 }
 
 type Validator struct {

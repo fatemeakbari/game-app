@@ -38,7 +38,7 @@ func TestIsPhoneNumberUnique(t *testing.T) {
 
 	for _, test := range testcases {
 
-		if res, err := db.IsPhoneNumberUnique("0988"); err != nil {
+		if res, err := db.IsPhoneNumberExist("0988"); err != nil {
 			t.Error(err)
 		} else {
 			if res != test.expectedResult {

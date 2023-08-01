@@ -1,4 +1,4 @@
-package userentity
+package user
 
 type UserInfo struct {
 	ID          uint   `json:"id"`

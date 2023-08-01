@@ -22,21 +22,20 @@ func (db *DB) Register(user model.User) (model.User, error) {
 
 }
 
-func (db *DB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
+func (db *DB) IsPhoneNumberExist(phoneNumber string) (bool, error) {
 
 	row := db.db.QueryRow(`select id from users where phone_number = ?`, phoneNumber)
 	var id uint
 	err := row.Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-
-			return true, nil
+			return false, nil
 		}
 
 		return false, err
 	}
 
-	return false, nil
+	return true, nil
 }
 
 func (db *DB) FindUserByPhoneNumber(phoneNumber string) (model.User, error) {
