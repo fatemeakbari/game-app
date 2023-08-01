@@ -8,7 +8,7 @@ services:
       - SYS_NICE
     restart: always
     environment:
-      - MYSQL_DATABASE=messagingapp
+      - MYSQL_DATABASE=gameapp
       - MYSQL_ROOT_PASSWORD=12345
     ports:
       - '3309:3306'
