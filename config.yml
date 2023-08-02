@@ -1,0 +1,13 @@
+type: yml
+DB:
+  mysql: mysql
+  user: root
+  password: 12345
+  host: localhost
+  port:  3309
+  name:  gameapp
+
+auth:
+  token_access_duration: "720h0m0s"
+  token_refresh_duration: "720h0m0s"
+#  token_secret_key: "ddddddddddddddddddddd"
