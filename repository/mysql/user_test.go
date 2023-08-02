@@ -6,14 +6,7 @@ import (
 	"testing"
 )
 
-var db = mysql.New(mysql.Config{
-	Driver: "mysql",
-	Name:   "messagingapp",
-	User:   "root",
-	Pass:   "12345",
-	Host:   "localhost",
-	Port:   "3309",
-})
+var db = mysql.New(mysql.Config{})
 
 func TestRegister(t *testing.T) {
 

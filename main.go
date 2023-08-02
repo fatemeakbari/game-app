@@ -10,29 +10,14 @@ import (
 	"gameapp/service/auth"
 	userservice "gameapp/service/user"
 	uservalidator "gameapp/validator/user"
-	"time"
 )
 
 func main() {
 
-	config := cfg.Config{
-		DBConfig: mysql.Config{
-			Driver: "mysql",
-			Name:   "messagingapp",
-			User:   "root",
-			Pass:   "12345",
-			Host:   "localhost",
-			Port:   "3309",
-		},
+	config := cfg.Load()
 
-		AuthConfig: authservice.Config{
-			TokenExpirationDuration: time.Hour * 24 * 7,
-			TokenRefreshDuration:    time.Hour * 24 * 30,
-			TokenSecretKey:          "mdnfkfsdfkhsdfjaslsfdsfsf",
-		},
-	}
-	userRepository := mysql.New(config.DBConfig)
-	authService := authservice.New(config.AuthConfig)
+	userRepository := mysql.New(config.DB)
+	authService := authservice.New(config.Auth)
 	userValidator := uservalidator.New(userRepository)
 
 	userService := userservice.Service{

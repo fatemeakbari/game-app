@@ -32,7 +32,7 @@ type Service struct {
 func New(config Config) Service {
 	return Service{
 		secretKey:               config.TokenSecretKey,
-		tokenExpirationDuration: config.TokenExpirationDuration,
+		tokenExpirationDuration: config.TokenAccessDuration,
 		tokenRefreshDuration:    config.TokenRefreshDuration,
 	}
 }

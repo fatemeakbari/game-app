@@ -3,12 +3,12 @@ package mysql
 import "fmt"
 
 type Config struct {
-	Driver string
-	User   string
-	Pass   string
-	Host   string
-	Port   string
-	Name   string
+	Driver string `koanf:"mysql"`
+	User   string `koanf:"user"`
+	Pass   string `koanf:"password"`
+	Host   string `koanf:"host"`
+	Port   string `koanf:"port"`
+	Name   string `koanf:"name"`
 }
 
 func (c Config) buildURL() string {

@@ -3,7 +3,7 @@ package authservice
 import "time"
 
 type Config struct {
-	TokenExpirationDuration time.Duration
-	TokenRefreshDuration    time.Duration
-	TokenSecretKey          string
+	TokenAccessDuration  time.Duration `koanf:"token_access_duration"`
+	TokenRefreshDuration time.Duration `koanf:"token_refresh_duration"`
+	TokenSecretKey       string        `koanf:"token_secret_key"`
 }
