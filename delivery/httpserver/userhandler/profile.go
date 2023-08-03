@@ -1,7 +1,6 @@
 package userhandler
 
 import (
-	"fmt"
 	"gameapp/entity/auth"
 	entity "gameapp/entity/user"
 	"github.com/labstack/echo/v4"
@@ -15,9 +14,6 @@ func (h *Handler) userProfileHandler(c echo.Context) error {
 	//token = strings.Replace(token, "Bearer ", "", 1)
 
 	claims := c.Get("claims").(auth.Claims)
-
-	fmt.Println("claims", claims)
-	//claims, err := h.authService.Parse(token)
 
 	profileReq := entity.ProfileRequest{
 		UserId: claims.UserID,

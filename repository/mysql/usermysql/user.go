@@ -9,7 +9,7 @@ import (
 
 func (db DB) Register(user usermodel.User) (usermodel.User, error) {
 
-	res, err := db.db.Exec(`insert into users(name, phone_number, password) values (?,?,?)`, user.Name, user.PhoneNumber, user.Password)
+	res, err := db.db.Exec(`insert into users(name, phone_number, password, role) values (?,?,?,?)`, user.Name, user.PhoneNumber, user.Password, uint(user.Role))
 
 	if err != nil {
 		return usermodel.User{}, err
@@ -44,7 +44,7 @@ func (db DB) FindUserByPhoneNumber(phoneNumber string) (usermodel.User, error) {
 	var user usermodel.User
 	var createDate []uint8
 
-	err := row.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createDate, &user.Password)
+	err := row.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createDate, &user.Password, &user.Role)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -63,7 +63,7 @@ func (db DB) FindUserById(userId uint) (usermodel.User, error) {
 	var user usermodel.User
 	var createDate []uint8
 
-	err := row.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createDate, &user.Password)
+	err := row.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createDate, &user.Password, &user.Role)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

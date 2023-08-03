@@ -19,6 +19,7 @@ func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 			Name:        req.Name,
 			PhoneNumber: req.PhoneNumber,
 			Password:    s.Hashing.Hash(req.Password),
+			Role:        usermodel.UserRole,
 		},
 	)
 

@@ -51,6 +51,7 @@ func (s Service) generate(user usermodel.User, subject string, expireDate time.D
 	// you would like it to contain.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &auth.Claims{
 		UserID: user.ID,
+		Role:   user.Role.String(),
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   subject,
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

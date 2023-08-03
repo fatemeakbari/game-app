@@ -6,7 +6,9 @@ import (
 	"gameapp/delivery/httpserver/middleware"
 	"gameapp/delivery/httpserver/userhandler"
 	"gameapp/pkg/hashing"
+	accesscontrolmysql "gameapp/repository/mysql/accesscontrol"
 	"gameapp/repository/mysql/usermysql"
+	accesscontrolservice "gameapp/service/accesscontrol"
 	"gameapp/service/auth"
 	userservice "gameapp/service/user"
 	uservalidator "gameapp/validator/user"
@@ -29,7 +31,11 @@ func main() {
 
 	authMW := middleware.New(authService)
 
-	userHandler := *userhandler.New(userService, authService, authMW)
+	aclRepository := accesscontrolmysql.New(config.DB)
+	aclService := accesscontrolservice.New(aclRepository)
+	aclMW := middleware.NewACLMiddleware(aclService)
+
+	userHandler := *userhandler.New(userService, authService, authMW, aclMW)
 
 	server := httpserver.Server{
 		UserHandler: userHandler,
