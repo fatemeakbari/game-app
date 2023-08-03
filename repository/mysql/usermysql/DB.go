@@ -1,7 +1,8 @@
-package mysql
+package usermysql
 
 import (
 	"database/sql"
+	"gameapp/repository/mysql"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"time"
@@ -11,9 +12,9 @@ type DB struct {
 	db *sql.DB
 }
 
-func New(cfg Config) *DB {
+func New(cfg mysql.Config) *DB {
 
-	db, err := sql.Open(cfg.Driver, cfg.buildURL())
+	db, err := sql.Open(cfg.Driver, cfg.BuildURL())
 	if err != nil {
 		log.Fatal("can not connect to sql driver", err)
 	}

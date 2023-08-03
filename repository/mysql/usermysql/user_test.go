@@ -1,4 +1,4 @@
-package mysql_test
+package usermysql
 
 import (
 	"gameapp/model/usermodel"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var db = mysql.New(mysql.Config{})
+var db = New(mysql.Config{})
 
 func TestRegister(t *testing.T) {
 

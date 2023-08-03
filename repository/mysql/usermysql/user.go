@@ -1,4 +1,4 @@
-package mysql
+package usermysql
 
 import (
 	"database/sql"
@@ -7,12 +7,12 @@ import (
 	"gameapp/model/usermodel"
 )
 
-func (db *DB) Register(user usermodel.User) (usermodel.User, error) {
+func (db DB) Register(user usermodel.User) (usermodel.User, error) {
 
 	res, err := db.db.Exec(`insert into users(name, phone_number, password) values (?,?,?)`, user.Name, user.PhoneNumber, user.Password)
 
 	if err != nil {
-		return user.User{}, err
+		return usermodel.User{}, err
 	}
 
 	id, _ := res.LastInsertId()
@@ -22,7 +22,7 @@ func (db *DB) Register(user usermodel.User) (usermodel.User, error) {
 
 }
 
-func (db *DB) IsPhoneNumberExist(phoneNumber string) (bool, error) {
+func (db DB) IsPhoneNumberExist(phoneNumber string) (bool, error) {
 
 	row := db.db.QueryRow(`select id from users where phone_number = ?`, phoneNumber)
 	var id uint
@@ -38,7 +38,7 @@ func (db *DB) IsPhoneNumberExist(phoneNumber string) (bool, error) {
 	return true, nil
 }
 
-func (db *DB) FindUserByPhoneNumber(phoneNumber string) (usermodel.User, error) {
+func (db DB) FindUserByPhoneNumber(phoneNumber string) (usermodel.User, error) {
 	row := db.db.QueryRow(`select * from users where phone_number = ?`, phoneNumber)
 
 	var user usermodel.User
@@ -48,16 +48,16 @@ func (db *DB) FindUserByPhoneNumber(phoneNumber string) (usermodel.User, error) 
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return user.User{}, errors.New("user not found")
+			return usermodel.User{}, errors.New("user not found")
 		}
-		return user.User{}, fmt.Errorf("unexpected error : %w", err)
+		return usermodel.User{}, fmt.Errorf("unexpected error : %w", err)
 	}
 
 	return user, nil
 
 }
 
-func (db *DB) FindUserById(userId uint) (usermodel.User, error) {
+func (db DB) FindUserById(userId uint) (usermodel.User, error) {
 	row := db.db.QueryRow(`select * from users where id = ?`, userId)
 
 	var user usermodel.User
@@ -67,9 +67,9 @@ func (db *DB) FindUserById(userId uint) (usermodel.User, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return user.User{}, errors.New("user not found")
+			return usermodel.User{}, errors.New("user not found")
 		}
-		return user.User{}, fmt.Errorf("unexpected error : %w", err)
+		return usermodel.User{}, fmt.Errorf("unexpected error : %w", err)
 	}
 
 	return user, nil

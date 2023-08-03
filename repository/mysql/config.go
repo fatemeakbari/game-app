@@ -11,6 +11,6 @@ type Config struct {
 	Name   string `koanf:"name"`
 }
 
-func (c Config) buildURL() string {
+func (c Config) BuildURL() string {
 	return fmt.Sprintf(`%s:%s@(%s:%s)/%s`, c.User, c.Pass, c.Host, c.Port, c.Name)
 }

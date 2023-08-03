@@ -6,7 +6,7 @@ import (
 	"gameapp/delivery/httpserver/middleware"
 	"gameapp/delivery/httpserver/userhandler"
 	"gameapp/pkg/hashing"
-	"gameapp/repository/mysql"
+	"gameapp/repository/mysql/usermysql"
 	"gameapp/service/auth"
 	userservice "gameapp/service/user"
 	uservalidator "gameapp/validator/user"
@@ -16,7 +16,7 @@ func main() {
 
 	config := cfg.Load()
 
-	userRepository := mysql.New(config.DB)
+	userRepository := usermysql.New(config.DB)
 	authService := authservice.New(config.Auth)
 	userValidator := uservalidator.New(userRepository)
 
