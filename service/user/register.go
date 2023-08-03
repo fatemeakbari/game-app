@@ -2,7 +2,7 @@ package user
 
 import (
 	. "gameapp/entity/user"
-	"gameapp/model"
+	"gameapp/model/usermodel"
 	"gameapp/pkg/errorhandler"
 	"gameapp/pkg/errorhandler/errorcodestatus"
 	"gameapp/pkg/errorhandler/errormessage"
@@ -15,7 +15,7 @@ func (s *Service) Register(req RegisterRequest) (RegisterResponse, error) {
 	}
 
 	user, err := s.UserRepository.Register(
-		model.User{
+		usermodel.User{
 			Name:        req.Name,
 			PhoneNumber: req.PhoneNumber,
 			Password:    s.Hashing.Hash(req.Password),

@@ -1,7 +1,7 @@
 package user
 
 import (
-	"gameapp/model"
+	"gameapp/model/usermodel"
 )
 
 const (
@@ -10,7 +10,7 @@ const (
 
 type Repository interface {
 	IsPhoneNumberExist(phoneNumber string) (bool, error)
-	FindUserByPhoneNumber(phoneNumber string) (model.User, error)
+	FindUserByPhoneNumber(phoneNumber string) (usermodel.User, error)
 }
 
 type Validator struct {

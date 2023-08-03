@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gameapp/entity/auth"
-	"gameapp/model"
+	"gameapp/model/usermodel"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
@@ -19,8 +19,8 @@ type JwtTokenParser interface {
 }
 
 type JwtTokenGenerator interface {
-	GenerateAccessToken(user model.User) (string, error)
-	GenerateRefreshToken(user model.User) (string, error)
+	GenerateAccessToken(user usermodel.User) (string, error)
+	GenerateRefreshToken(user usermodel.User) (string, error)
 }
 
 type Service struct {
@@ -37,15 +37,15 @@ func New(config Config) Service {
 	}
 }
 
-func (s Service) GenerateAccessToken(user model.User) (string, error) {
+func (s Service) GenerateAccessToken(user usermodel.User) (string, error) {
 	return s.generate(user, AccessTokenSubject, s.tokenExpirationDuration)
 }
 
-func (s Service) GenerateRefreshToken(user model.User) (string, error) {
+func (s Service) GenerateRefreshToken(user usermodel.User) (string, error) {
 	return s.generate(user, RefreshTokenSubject, s.tokenRefreshDuration)
 }
 
-func (s Service) generate(user model.User, subject string, expireDate time.Duration) (string, error) {
+func (s Service) generate(user usermodel.User, subject string, expireDate time.Duration) (string, error) {
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.

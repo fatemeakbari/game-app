@@ -1,7 +1,7 @@
 package mysql_test
 
 import (
-	"gameapp/model"
+	"gameapp/model/usermodel"
 	"gameapp/repository/mysql"
 	"testing"
 )
@@ -10,7 +10,7 @@ var db = mysql.New(mysql.Config{})
 
 func TestRegister(t *testing.T) {
 
-	_, err := db.Register(model.User{Name: "fateme", PhoneNumber: "09151870482"})
+	_, err := db.Register(usermodel.User{Name: "fateme", PhoneNumber: "09151870482"})
 
 	if err != nil {
 		t.Error(err)
