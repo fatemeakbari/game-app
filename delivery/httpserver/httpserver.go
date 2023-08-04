@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	backofficehandler "gameapp/delivery/httpserver/userbackoffice"
 	"gameapp/delivery/httpserver/userhandler"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -8,7 +9,8 @@ import (
 )
 
 type Server struct {
-	UserHandler userhandler.Handler
+	UserHandler           userhandler.Handler
+	UserBackOfficeHandler backofficehandler.Handler
 }
 
 func (s *Server) Serve() {
@@ -21,6 +23,7 @@ func (s *Server) Serve() {
 
 	// Routes
 	s.UserHandler.Route(e)
+	s.UserBackOfficeHandler.Route(e)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
