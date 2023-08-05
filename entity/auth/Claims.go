@@ -4,8 +4,8 @@ import "github.com/golang-jwt/jwt/v4"
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserID uint
-	Role   string
+	UserID uint   `json:"user_id"`
+	Role   string `json:"role"`
 }
 
 func (c Claims) Valid() error {

@@ -11,3 +11,10 @@ auth:
   token_access_duration: "720h0m0s"
   token_refresh_duration: "720h0m0s"
 #  token_secret_key: "ddddddddddddddddddddd"
+
+
+redis:
+  host: localhost
+  port: 6379
+  password: ""
+  db: 0

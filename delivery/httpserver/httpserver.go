@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"gameapp/delivery/httpserver/maching"
 	backofficehandler "gameapp/delivery/httpserver/userbackoffice"
 	"gameapp/delivery/httpserver/userhandler"
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ import (
 type Server struct {
 	UserHandler           userhandler.Handler
 	UserBackOfficeHandler backofficehandler.Handler
+	PlayerMatchHandler    matchinghandler.Handler
 }
 
 func (s *Server) Serve() {
@@ -24,6 +26,7 @@ func (s *Server) Serve() {
 	// Routes
 	s.UserHandler.Route(e)
 	s.UserBackOfficeHandler.Route(e)
+	s.PlayerMatchHandler.Route(e)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
