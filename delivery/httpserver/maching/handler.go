@@ -2,15 +2,15 @@ package matchinghandler
 
 import (
 	"gameapp/delivery/httpserver/middleware"
-	playermatchservice "gameapp/service/matching"
+	matchingservice "gameapp/service/matching"
 )
 
 type Handler struct {
-	service playermatchservice.Service
+	service matchingservice.Service
 	middleware.AuthMiddleWare
 }
 
-func New(service playermatchservice.Service, auth middleware.AuthMiddleWare) Handler {
+func New(service matchingservice.Service, auth middleware.AuthMiddleWare) Handler {
 
 	return Handler{
 		service:        service,

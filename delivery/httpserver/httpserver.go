@@ -12,7 +12,7 @@ import (
 type Server struct {
 	UserHandler           userhandler.Handler
 	UserBackOfficeHandler backofficehandler.Handler
-	PlayerMatchHandler    matchinghandler.Handler
+	MatchingHandler       matchinghandler.Handler
 }
 
 func (s *Server) Serve() {
@@ -26,7 +26,7 @@ func (s *Server) Serve() {
 	// Routes
 	s.UserHandler.Route(e)
 	s.UserBackOfficeHandler.Route(e)
-	s.PlayerMatchHandler.Route(e)
+	s.MatchingHandler.Route(e)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

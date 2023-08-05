@@ -2,14 +2,14 @@ package matchinghandler
 
 import (
 	"gameapp/entity/auth"
-	playermatchentity "gameapp/entity/matching"
+	matchingentity "gameapp/entity/matching"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
 func (h Handler) addUserToWaitingList(c echo.Context) error {
 
-	var req playermatchentity.AddUserToWaitingListRequest
+	var req matchingentity.AddUserToWaitingListRequest
 
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "request format is wrong")

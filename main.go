@@ -3,20 +3,20 @@ package main
 import (
 	"gameapp/cfg"
 	"gameapp/delivery/httpserver"
-	playermatchhandler "gameapp/delivery/httpserver/maching"
+	matchinghandler "gameapp/delivery/httpserver/maching"
 	"gameapp/delivery/httpserver/middleware"
 	userbackofficehandler "gameapp/delivery/httpserver/userbackoffice"
 	"gameapp/delivery/httpserver/userhandler"
 	"gameapp/pkg/hashing"
 	accesscontrolmysql "gameapp/repository/mysql/accesscontrol"
 	"gameapp/repository/mysql/usermysql"
-	playermatchredis "gameapp/repository/redis/matching"
+	matchingredis "gameapp/repository/redis/matching"
 	accesscontrolservice "gameapp/service/accesscontrol"
 	"gameapp/service/auth"
-	playermatchservice "gameapp/service/matching"
+	matchingservice "gameapp/service/matching"
 	userservice "gameapp/service/user"
 	userbackofficeservice "gameapp/service/userbackoffice"
-	playermatchvalidator "gameapp/validator/matching"
+	matchingvalidator "gameapp/validator/matching"
 	uservalidator "gameapp/validator/user"
 )
 
@@ -35,9 +35,9 @@ func main() {
 		Validator:      userValidator,
 	}
 
-	redisDB := playermatchredis.New(config.Redis)
-	playerMatchValidator := playermatchvalidator.New()
-	platerMatchService := playermatchservice.New(redisDB, playerMatchValidator)
+	redisDB := matchingredis.New(config.Redis)
+	matchingValidator := matchingvalidator.New()
+	platerMatchService := matchingservice.New(redisDB, matchingValidator)
 
 	userBackOfficeService := userbackofficeservice.New(userRepository)
 
@@ -51,12 +51,12 @@ func main() {
 
 	userBackOfficeHandler := *userbackofficehandler.New(userBackOfficeService, authMW, aclMW)
 
-	playerMatchHandler := playermatchhandler.New(platerMatchService, authMW)
+	matchingHandler := matchinghandler.New(platerMatchService, authMW)
 
 	server := httpserver.Server{
 		UserHandler:           userHandler,
 		UserBackOfficeHandler: userBackOfficeHandler,
-		PlayerMatchHandler:    playerMatchHandler,
+		MatchingHandler:       matchingHandler,
 	}
 
 	server.Serve()
