@@ -12,7 +12,8 @@ func Load() *Config {
 	var k = koanf.New(".")
 
 	k.Load(confmap.Provider(map[string]interface{}{
-		"auth.token_secret_key": "dsfkashfkhsdfkshfasfjsflflsf",
+		"auth.token_secret_key":                "dsfkashfkhsdfkshfasfjsflflsf",
+		"http_server.server_shutdown_duration": "5s",
 	}, "."), nil)
 
 	//read from config.yml

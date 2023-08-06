@@ -3,6 +3,7 @@ package matchinghandler
 import (
 	"gameapp/entity/auth"
 	matchingentity "gameapp/entity/matching"
+	"gameapp/model"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -15,6 +16,7 @@ func (h Handler) addUserToWaitingList(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "request format is wrong")
 	}
 
+	h.service.MatchWaitingPlayer(model.FootballCategory)
 	claims := c.Get("claims").(auth.Claims)
 	req.UserId = claims.UserID
 

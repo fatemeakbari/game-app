@@ -8,6 +8,7 @@ import (
 type Repository interface {
 	AddUserToWaitingList(userId uint, category model.Category) error
 	RemoveUserFromWaitingList(userId uint, category model.Category) error
+	GetWaitingPlayerByCategory(category model.Category)
 }
 
 type Validator interface {
@@ -42,4 +43,9 @@ func (s *Service) AddUserToWaitingList(req entity.AddUserToWaitingListRequest) (
 	}
 
 	return entity.AddUserToWaitingListResponse{}, nil
+}
+
+func (s *Service) MatchWaitingPlayer(category model.Category) {
+
+	s.rep.GetWaitingPlayerByCategory(category)
 }

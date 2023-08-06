@@ -10,6 +10,7 @@ import (
 )
 
 type Server struct {
+	Router                *echo.Echo
 	UserHandler           userhandler.Handler
 	UserBackOfficeHandler backofficehandler.Handler
 	MatchingHandler       matchinghandler.Handler
@@ -17,19 +18,18 @@ type Server struct {
 
 func (s *Server) Serve() {
 
-	e := echo.New()
-
 	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	s.Router.Use(middleware.Logger())
+	s.Router.Use(middleware.Recover())
 
 	// Routes
-	s.UserHandler.Route(e)
-	s.UserBackOfficeHandler.Route(e)
-	s.MatchingHandler.Route(e)
+	s.UserHandler.Route(s.Router)
+	s.UserBackOfficeHandler.Route(s.Router)
+	s.MatchingHandler.Route(s.Router)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8080"))
+	//TODO server port must be confined
+	s.Router.Logger.Fatal(s.Router.Start(":8080"))
 
 }
 
