@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	adapter "gameapp/adapter/redis"
 	"gameapp/cfg"
 	matchingredis "gameapp/repository/redis/matching"
 	"gameapp/scheduler"
@@ -14,7 +15,8 @@ import (
 func main() {
 
 	config := cfg.Load()
-	redisDB := matchingredis.New(config.Redis)
+	adapter := adapter.New(config.Redis)
+	redisDB := matchingredis.New(adapter)
 	matchingValidator := matchingvalidator.New()
 	matchingService := matchingservice.New(redisDB, matchingValidator)
 

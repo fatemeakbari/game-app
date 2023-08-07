@@ -8,12 +8,14 @@ import (
 type Handler struct {
 	service matchingservice.Service
 	middleware.AuthMiddleWare
+	middleware.PresenceMiddleWare
 }
 
-func New(service matchingservice.Service, auth middleware.AuthMiddleWare) Handler {
+func New(service matchingservice.Service, auth middleware.AuthMiddleWare, presence middleware.PresenceMiddleWare) Handler {
 
 	return Handler{
-		service:        service,
-		AuthMiddleWare: auth,
+		service:            service,
+		AuthMiddleWare:     auth,
+		PresenceMiddleWare: presence,
 	}
 }

@@ -1,9 +1,10 @@
 package cfg
 
 import (
+	redis "gameapp/adapter/redis"
 	"gameapp/repository/mysql"
-	"gameapp/repository/redis"
-	authservice "gameapp/service/auth"
+	auth "gameapp/service/auth"
+	presence "gameapp/service/presence"
 	"time"
 )
 
@@ -12,8 +13,9 @@ type HttpServer struct {
 	ServerShutdownDuration time.Duration `koanf:"server_shutdown_duration"`
 }
 type Config struct {
-	HttpServer HttpServer         `koanf:"http_server"`
-	DB         mysql.Config       `koanf:"DB"`
-	Auth       authservice.Config `koanf:"auth"`
-	Redis      redis.Config       `koanf:"redis""`
+	HttpServer HttpServer      `koanf:"http_server"`
+	DB         mysql.Config    `koanf:"DB"`
+	Auth       auth.Config     `koanf:"auth"`
+	Redis      redis.Config    `koanf:"redis""`
+	Presence   presence.Config `koanf:"presence"`
 }

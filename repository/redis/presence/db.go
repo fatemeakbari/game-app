@@ -1,4 +1,4 @@
-package matchingredis
+package presenceredis
 
 import (
 	adapter "gameapp/adapter/redis"

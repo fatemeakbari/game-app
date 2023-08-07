@@ -1,6 +1,7 @@
 package matchingredis
 
 import (
+	"context"
 	"fmt"
 	"gameapp/model"
 	"gameapp/pkg/errorhandler"
@@ -16,7 +17,7 @@ const waitingListNameFormat = `waitingList:%s`
 func (db *DB) AddUserToWaitingList(userId uint, category model.Category) error {
 
 	key := fmt.Sprintf(waitingListNameFormat, category)
-	_, err := db.db.ZAdd(db.ctx, key, goredis.Z{
+	_, err := db.adapter.Client.ZAdd(context.Background(), key, goredis.Z{
 		Score:  float64(time.Now().UnixMilli()),
 		Member: strconv.Itoa(int(userId)),
 	}).Result()
@@ -37,7 +38,7 @@ func (db *DB) RemoveUserFromWaitingList(userId uint, category model.Category) er
 
 	key := fmt.Sprintf(waitingListNameFormat, category)
 
-	_, err := db.db.ZRem(db.ctx, key, goredis.Z{
+	_, err := db.adapter.Client.ZRem(context.Background(), key, goredis.Z{
 		Score:  float64(time.Now().UnixMilli()),
 		Member: strconv.Itoa(int(userId)),
 	}).Result()
@@ -53,7 +54,7 @@ func (db *DB) GetWaitingPlayerByCategory(category model.Category) {
 
 	key := getKey(category)
 
-	zset, err := db.db.ZRangeWithScores(db.ctx, key, 0, -1).Result()
+	zset, err := db.adapter.Client.ZRangeWithScores(context.Background(), key, 0, -1).Result()
 
 	if err != nil {
 		panic(err)
@@ -67,7 +68,7 @@ func (db *DB) GetWaitingPlayerByCategory(category model.Category) {
 		item1 := zset[i]
 		item2 := zset[i+1]
 		fmt.Printf("matching user %s and user %s\n", item1.Member, item2.Member)
-		db.db.ZRemRangeByScore(db.ctx, key, strconv.Itoa(int(item1.Score)), strconv.Itoa(int(item2.Score)))
+		db.adapter.Client.ZRemRangeByScore(context.Background(), key, strconv.Itoa(int(item1.Score)), strconv.Itoa(int(item2.Score)))
 	}
 
 }

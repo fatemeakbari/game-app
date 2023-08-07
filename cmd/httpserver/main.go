@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	adapter "gameapp/adapter/redis"
 	"gameapp/cfg"
 	"gameapp/delivery/httpserver"
 	matchinghandler "gameapp/delivery/httpserver/maching"
@@ -13,7 +14,9 @@ import (
 	accesscontrolmysql "gameapp/repository/mysql/accesscontrol"
 	"gameapp/repository/mysql/usermysql"
 	matchingredis "gameapp/repository/redis/matching"
+	presenceredis "gameapp/repository/redis/presence"
 	matchingservice "gameapp/service/matching"
+	presenceservice "gameapp/service/presence"
 	matchingvalidator "gameapp/validator/matching"
 	"github.com/labstack/echo/v4"
 	"os"
@@ -43,7 +46,8 @@ func main() {
 		Validator:      userValidator,
 	}
 
-	redisDB := matchingredis.New(config.Redis)
+	adapter := adapter.New(config.Redis)
+	redisDB := matchingredis.New(adapter)
 	matchingValidator := matchingvalidator.New()
 	matchingService := matchingservice.New(redisDB, matchingValidator)
 
@@ -55,11 +59,15 @@ func main() {
 	aclService := accesscontrolservice.New(aclRepository)
 	aclMW := middleware.NewACLMiddleware(aclService)
 
-	userHandler := *userhandler.New(userService, authService, authMW)
+	presenceRep := presenceredis.New(adapter)
+	presenceService := presenceservice.New(presenceRep, config.Presence)
+	presenceMW := middleware.NewPresence(presenceService)
+
+	userHandler := *userhandler.New(userService, authService, authMW, presenceMW)
 
 	userBackOfficeHandler := *userbackofficehandler.New(userBackOfficeService, authMW, aclMW)
 
-	matchingHandler := matchinghandler.New(matchingService, authMW)
+	matchingHandler := matchinghandler.New(matchingService, authMW, presenceMW)
 
 	server := httpserver.Server{
 		Router:                echo.New(),
