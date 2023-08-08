@@ -19,6 +19,7 @@ services:
 
   gameapp-redis:
     image: bitnami/redis:6.2
+    container_name: gameapp-redis
     restart: always
     volumes:
       - gameapp-redis-data:/data

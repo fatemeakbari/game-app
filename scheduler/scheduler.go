@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	"fmt"
 	"gameapp/model"
 	matchingservice "gameapp/service/matching"
@@ -23,12 +24,12 @@ func (s *Scheduler) Start(done <-chan bool) {
 
 	sch := gocron.NewScheduler(time.UTC).CronWithSeconds("*/30 * * * * *")
 
-	fmt.Println("start")
 	_, err := sch.Do(s.matchPlayer) // every second
 
 	if err != nil {
 		fmt.Println("err", err)
 	}
+
 	sch.StartBlocking()
 	//for {
 	//
@@ -45,5 +46,14 @@ func (s *Scheduler) Start(done <-chan bool) {
 
 func (s *Scheduler) matchPlayer() {
 
-	s.service.MatchWaitingPlayer(model.FootballCategory)
+	for _, category := range model.CategoryList() {
+
+		fmt.Println("start scheduler for category ", category)
+
+		err := s.service.MatchWaitingPlayer(context.Background(), category)
+
+		if err != nil {
+			fmt.Println("err", err)
+		}
+	}
 }

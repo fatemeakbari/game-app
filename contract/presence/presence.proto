@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package= "contract/goproto/presenceadapter";
+
+package presence;
+service Presence {
+  rpc GetPresence(GetPresenceRequest) returns (GetPresenceResponse) {}
+}
+
+
+message GetPresenceRequest{
+  repeated uint64 UserIds = 1;
+}
+
+message PresenceInfo {
+  uint64 UserId = 1;
+  uint64 Timestamp = 2;
+}
+
+message GetPresenceResponse{
+  repeated PresenceInfo Infos = 1;
+}

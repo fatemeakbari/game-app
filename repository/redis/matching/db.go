@@ -1,7 +1,7 @@
 package matchingredis
 
 import (
-	adapter "gameapp/adapter/redis"
+	adapter "gameapp/adapter/redisadapter"
 )
 
 type DB struct {

@@ -1,7 +1,7 @@
 package cfg
 
 import (
-	redis "gameapp/adapter/redis"
+	redis "gameapp/adapter/redisadapter"
 	"gameapp/repository/mysql"
 	auth "gameapp/service/auth"
 	presence "gameapp/service/presence"

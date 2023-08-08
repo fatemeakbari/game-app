@@ -3,6 +3,7 @@ package matchingredis
 import (
 	"context"
 	"fmt"
+	matchingentity "gameapp/entity/matching"
 	"gameapp/model"
 	"gameapp/pkg/errorhandler"
 	"gameapp/pkg/errorhandler/errorcodestatus"
@@ -34,14 +35,25 @@ func (db *DB) AddUserToWaitingList(userId uint, category model.Category) error {
 
 }
 
-func (db *DB) RemoveUserFromWaitingList(userId uint, category model.Category) error {
+func (db *DB) RemoveFromWaitingList(ctx context.Context, category model.Category, userIds ...uint) error {
 
+	//TODO handle empty list
+	if len(userIds) == 0 {
+		return nil
+	}
 	key := fmt.Sprintf(waitingListNameFormat, category)
 
-	_, err := db.adapter.Client.ZRem(context.Background(), key, goredis.Z{
-		Score:  float64(time.Now().UnixMilli()),
-		Member: strconv.Itoa(int(userId)),
-	}).Result()
+	//_, err := db.adapter.Client.ZRem(context.Background(), key, goredis.Z{
+	//	Score:  float64(time.Now().UnixMilli()),
+	//	Member: strconv.Itoa(int(userId)),
+	//}).Result()
+
+	members := make([]any, 0)
+
+	for _, userID := range userIds {
+		members = append(members, strconv.Itoa(int(userID)))
+	}
+	_, err := db.adapter.Client.ZRem(ctx, key, members).Result()
 
 	if err != nil {
 		return fmt.Errorf("cant not remove user to waiting list %w", err)
@@ -50,26 +62,30 @@ func (db *DB) RemoveUserFromWaitingList(userId uint, category model.Category) er
 	return nil
 }
 
-func (db *DB) GetWaitingPlayerByCategory(category model.Category) {
+func (db *DB) GetWaitingPlayerByCategory(category model.Category) ([]matchingentity.WaitingMember, error) {
 
 	key := getKey(category)
 
 	zset, err := db.adapter.Client.ZRangeWithScores(context.Background(), key, 0, -1).Result()
 
+	waitingList := make([]matchingentity.WaitingMember, 0)
+
+	//TODO handle err
 	if err != nil {
-		panic(err)
+		return waitingList, err
 	}
-	if len(zset)%2 == 1 {
-		zset = zset[:len(zset)-1]
+	for _, item := range zset {
+
+		userId, _ := strconv.Atoi(item.Member.(string))
+
+		waitingList = append(waitingList, matchingentity.WaitingMember{
+			UserID:    uint(userId),
+			Timestamp: int64(item.Score),
+		})
+
 	}
 
-	for i := 0; i < len(zset)-1; i += 2 {
-
-		item1 := zset[i]
-		item2 := zset[i+1]
-		fmt.Printf("matching user %s and user %s\n", item1.Member, item2.Member)
-		db.adapter.Client.ZRemRangeByScore(context.Background(), key, strconv.Itoa(int(item1.Score)), strconv.Itoa(int(item2.Score)))
-	}
+	return waitingList, nil
 
 }
 
